@@ -1,14 +1,13 @@
 #include "usb_manager.h"
-#include "sys.h"
+//#include "uuid.h"
+//#include "sys.h"
+#include "hw_config.h"
 #include "unicode.h"
-
 extern u8 EP1BUSY;			//键盘数据发送忙标志
 //设置USB 连接/断线
 //enable:0,断开
 //       1,允许连接	   
 
-#define GBK_CODE 1
-#define UNICODE_CODE 1
 extern  u8 enter_sta;
 extern  u8 tab_sta;
 extern u8 moudle_flag;
@@ -27,22 +26,16 @@ void usb_port_set(u8 enable)
 	}
 }  
 
-
-
-
 void usb_use_init(void)
 {
-	
-		//USB的支持。。。。。。
-  usb_port_set(0); 	//USB先断开	【清零】
-	delay_ms(300);
-  usb_port_set(1);	//USB再次连接	【置位，则用于USB功能】
+//	
+//		//USB的支持。。。。。。
+//    usb_port_set(0); 	//USB先断开	【清零】
+//	delay_ms(300);
+//    usb_port_set(1);	//USB再次连接	【置位，则用于USB功能】
 
-	//USB配置
-	USB_Disconnect_Config();
-//	USB_Cable_Config(DISABLE);
-
-//        USB_Cable_Config(ENABLE);
+//	//USB配置
+//	USB_Disconnect_Config();
  	USB_Interrupts_Config();  
  	Set_USBClock();  
  	USB_Init();		
@@ -54,8 +47,41 @@ void usb_use_dis(void)
 }
 
 
-
 void usb_print(char *q)
+{
+		char *tok;
+		char m;
+		char *p;
+	  delay_ms(20);
+		for( p= q ;(*p) != '\0' ; p++)
+		{
+				tok=strtok(p,"");
+				m= *tok;
+			  
+			  Joystick_Send(m);
+				delay_us(1000);
+				delay_us(300);
+				delay_us(500);
+				delay_us(500);
+//				delay_us(500);
+					
+//				Joystick_Send(m);
+//        delay_us(1020);
+    
+
+				Joystick_Send(0);
+				delay_us(1000);
+				delay_us(300);
+				delay_us(500);
+				delay_us(500);
+//				Joystick_Send(0);
+//				delay_us(1020);
+
+
+		}
+}
+
+void usb_print_by_chinese(char *q , unsigned char model)
 {
 		char *tok;
 		char m,lengh,i,legh;
@@ -66,18 +92,18 @@ void usb_print(char *q)
 	  delay_ms(20);
 		for( p= q ;(*p) != '\0' ; p++)
 		{
-			if(GBK_CODE)
+			if(model==GBK_CODE)
 			{
 				if(*(u8*)p<0x81)
 				{
 					tok=strtok(p,"");
 					m= *tok;
 					
-					Joystick_Send(m,DISABLE);
+					Joystick_Send_by_language(m,DISABLE,ENGLISH_LANGUAGE);
 					delay_us(1500);
 
 
-					Joystick_Send(0,DISABLE);
+					Joystick_Send_by_language(m,DISABLE,ENGLISH_LANGUAGE);
 					delay_us(1500);
 			 }	
 			 else
@@ -86,23 +112,23 @@ void usb_print(char *q)
 				  lengh=strlen((char*)OutString);
 				  for(i=0;i<lengh;i++)
 					{
-				    Joystick_Send(254,DISABLE);
+						Joystick_Send_by_language(254,DISABLE,ENGLISH_LANGUAGE);
 						delay_us(1500);
 						if(OutString[i]==0x30)
-							 Joystick_Send(0x62,ENABLE);
+						   Joystick_Send_by_language(0x62,ENABLE,ENGLISH_LANGUAGE);
 						else
-						   Joystick_Send(OutString[i]+0x28,ENABLE);
+						   Joystick_Send_by_language(OutString[i]+0x28,ENABLE,ENGLISH_LANGUAGE);
 						delay_us(1500);
 					}
-					Joystick_Send(254,DISABLE);
+					Joystick_Send_by_language(254,DISABLE,ENGLISH_LANGUAGE);
 					delay_us(1500);
-					Joystick_Send(0,DISABLE);
+					Joystick_Send_by_language(0,DISABLE,ENGLISH_LANGUAGE);
 					delay_us(1500);
 					memset(OutString,0,10);
 				  p++;
 			 }
 		  }
-			else if(UNICODE_CODE)
+			else if(model==UNICODE_CODE)
 			{
 				lengh=IsTextUTF8(p);
 				if(lengh==1)
@@ -110,11 +136,11 @@ void usb_print(char *q)
 				  tok=strtok(p,"");
 					m= *tok;
 					
-					Joystick_Send(m,DISABLE);
+					Joystick_Send_by_language(m,DISABLE,ENGLISH_LANGUAGE);
 					delay_us(1500);
 
 
-					Joystick_Send(0,DISABLE);
+					Joystick_Send_by_language(0,DISABLE,ENGLISH_LANGUAGE);
 					delay_us(1500);
 				}
 				else
@@ -126,17 +152,17 @@ void usb_print(char *q)
 					legh=strlen((char*)OutString);
 					 for(i=0;i<legh;i++)
 					{
-				    Joystick_Send(254,DISABLE);
+				    Joystick_Send_by_language(254,DISABLE,ENGLISH_LANGUAGE);
 						delay_us(1500);
 						if(OutString[i]==0x30)
-							 Joystick_Send(0x62,ENABLE);
+							Joystick_Send_by_language(0x62,ENABLE,ENGLISH_LANGUAGE);
 						else
-						   Joystick_Send(OutString[i]+0x28,ENABLE);
+						   Joystick_Send_by_language(OutString[i]+0x28,ENABLE,ENGLISH_LANGUAGE);
 						delay_us(1500);
 					}
-					Joystick_Send(254,DISABLE);
+					Joystick_Send_by_language(254,DISABLE,ENGLISH_LANGUAGE);
 					delay_us(1500);
-					Joystick_Send(0,DISABLE);
+					Joystick_Send_by_language(0,DISABLE,ENGLISH_LANGUAGE);
 					delay_us(1500);
 					memset(OutString,0,10);
 				  p+=(lengh-1);
@@ -146,7 +172,5 @@ void usb_print(char *q)
 			}
 		}
 }
-
-
 
 

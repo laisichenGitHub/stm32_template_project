@@ -9,8 +9,8 @@
 #include "stm32f10x.h"
 #include "uart.h"
 #include "delay.h"
-//#include "usb_manager.h"
-#include "usb_use.h"
+#include "usb_manager.h"
+
 
 void InitDriver()
 {

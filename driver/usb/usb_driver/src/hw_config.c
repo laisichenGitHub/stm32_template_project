@@ -21,7 +21,7 @@
 #include "platform_config.h"
 #include "usb_pwr.h"
 #include "usb_lib.h"
-#include "usb_use.h"
+#include "usb_manager.h"
 
 
 //对键盘的支持
