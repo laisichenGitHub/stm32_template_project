@@ -659,6 +659,434 @@ void Joystick_Send(u8 Keys)
 
 }
 
+void Joystick_Send_by_language(u8 Keys,u8 confirm,u8 language)
+{
+  u8 Buffer[8] = {0, 0, 0, 0, 0, 0, 0, 0};  //0,1,2,3,4,5,6,7
+//  u8 i;
+//  i=2;
+  
+  //对各个按键进行处理。注意，由于这里的摇杆5个按键
+  //不可能同时按下，所以返回的普通键数量不会超过6个。
+  //如果你的键盘同时按下的普通键能够超过6个的话，就需要做
+  //点特殊处理了，将后面6字节全部设置为0xFF，表示按键无法识别。
+
+   //对小写英文字母的支持
+  
+//对大写英文字母的支持
+	if(Keys==254)
+	{
+			Buffer[0] =0x40;
+	}
+	else if (Keys>=0x59&&Keys<=0x62&&confirm==ENABLE)
+	{
+			Buffer[0] =0x40;
+		  Buffer[7] =Keys;
+	}
+	else if(Keys == '\a')
+	{
+			Buffer[0] = 0x02;
+	}
+	else if (('A' <= Keys)&&(Keys <= 'Z') ) {    //int islower(int c);   检查参数c是否为小写英文字母...
+	  Buffer[0] = 0x02;
+		Buffer[7] = (Keys - ('A' - 0x04));    
+  }
+  else if (('a' <= Keys)&&(Keys <= 'z'))
+	{    //int islower(int c);   检查参数c是否为小写英文字母...
+	   Buffer[7] = (Keys - ('a' - 0x04));  
+  }
+	else {
+  //对数字键的支持
+	if(language == ENGLISH_LANGUAGE)
+	{
+			switch(Keys){
+			case 48 :
+			Buffer[7] = KEY_0;	  //0  【字符0对应的ASIC码是 48】
+			break;
+			case 49 :
+			Buffer[7] = KEY_1;	  //1
+			break;
+			case 50 :
+			Buffer[7] = KEY_2;    //2		
+			break;
+			case 51 :
+			Buffer[7] = KEY_3;    //3
+			break;
+			case 52 :
+			Buffer[7] = KEY_4;    //4
+			break;
+			case 53 :
+			Buffer[7] = KEY_5;    //5
+				break;
+			case 54 :
+			Buffer[7] = KEY_6;    //6
+			break;
+			case 55 :
+			Buffer[7] = KEY_7;    //7
+			break;
+			case 56 :
+			Buffer[7] = KEY_8;    //8
+			break;
+			case 57 :
+			Buffer[7] = KEY_9;    //9
+			break;	
+			case 0x2c :
+			Buffer[7] = 0x36;    //,
+			break;
+			case 0x2e :
+			Buffer[7] = 0x37;    //.
+			break;
+			case 0x2F :
+			Buffer[7] = 0x38;    //	/
+			break;
+			case 0x3b :
+			Buffer[7] = 0x33;    //;    
+			break;
+			case 0x27 :
+			Buffer[7] = 0x34;    //'    
+			break;
+			case 0x5b :
+			Buffer[7]= 0x2f;    //[    
+				break;
+			case 0x5d  :
+			Buffer[7] = 0x30;    //]    
+			break;
+			case 0x5c :
+			Buffer[7] =0x31;    //\   
+			break;
+			case 0x60 :
+			Buffer[7] = 0x35;    //`    
+			break;
+			case 0x2d :
+			Buffer[7] = 0x2d;    //-     
+			break;
+			case 0x3d  :
+			Buffer[7] = 0x2e;    //=  
+			break;
+			case '\n'  :
+			Buffer[7] = 0x28; //回车键 
+			break;
+			case '\t'  :
+			Buffer[7] = 0x2b; //tab键
+			break;
+			case 32  :
+			Buffer[7] = 0x2c; //tab键
+			break;
+		 
+			
+			//带左shift键---
+			case 0x3c :
+			Buffer[0] =0x02; 
+			Buffer[7]= 0x36;   //  <对应的ASICII码是0x3c，上报值是0x36
+			break;
+			case 0x3e :
+			Buffer[0] =0x02; 
+			Buffer[7] = 0x37;    //  >对应的ASICII码是0x3e，上报值是0x37
+			break; 
+			case 0x3f :
+			Buffer[0] = 0x02;
+			Buffer[7] = 0x38;   //  ?对应的ASICII码是0x3f，上报值是0x38
+			break;   
+			case 0x3a :
+			Buffer[0] = 0x02;
+				Buffer[7] = 0x33;   //  :对应的ASICII码是0x3a，上报值是0x33
+			break;
+			case 0x22 :
+			Buffer[0] = 0x02;
+			Buffer[7] = 0x34;	 //  "对应的ASICII码是0x22，上报值是0x34
+			break;
+			case 0x7b :
+			Buffer[0] = 0x02;
+			Buffer[7] = 0x2f;	 //  {对应的ASICII码是0x7b，上报值是0x2f
+			break;
+			case 0x7d :
+			Buffer[0] = 0x02;
+			Buffer[7] = 0x30;	 //  }对应的ASICII码是0x7d，上报值是0x30	
+			break;
+			case 0x7c :
+			Buffer[0] = 0x02;
+			Buffer[7] = 0x31;	 //  |对应的ASICII码是0x7c，上报值是0x31			 
+			break;
+			case 0x7e :
+			Buffer[0] = 0x02;
+			Buffer[7] = 0x35;	 //  ~对应的ASICII码是0x7e，上报值是0x32
+			break;
+			case 0x21 :
+			 Buffer[0] = 0x02;
+			 Buffer[7] = 0x1e;	 //  !对应的ASICII码是0x21，上报值是0x1e
+			 break;	
+
+			case 0x40 :
+			 Buffer[0] = 0x02;
+			 Buffer[7] = 0x1f;	 //  @对应的ASICII码是0x40，上报值是0x1f
+			 break;
+
+				
+			case 0x23 :
+			 Buffer[0] = 0x02;
+			 Buffer[7] = 0x20;	 //  #对应的ASICII码是0x23，上报值是0x20
+			 break;
+
+			case 0x24 :
+			 Buffer[0] = 0x02;
+			 Buffer[7]= 0x21;	 //  $对应的ASICII码是0x24，上报值是0x21
+			 break;
+			
+			case 0x25 :
+			 Buffer[0] = 0x02;
+			 Buffer[7] = 0x22;	 //  %对应的ASICII码是0x25，上报值是0x22
+			 break;  
+
+			case 0x5e :
+			 Buffer[0] = 0x02;
+			 Buffer[7] = 0x23;	 //  ^对应的ASICII码是0x5e，上报值是0x23
+			 break;
+
+				
+			case 0x26 :
+			 Buffer[0] = 0x02;
+			 Buffer[7] = 0x24;	 //  &对应的ASICII码是0x26，上报值是0x24
+			 break;
+
+				
+			case 0x2a :
+			 Buffer[0] = 0x02;
+			 Buffer[7]= 0x25;	 //  *对应的ASICII码是0x2a，上报值是0x25
+			 break;
+
+				
+			case 0x28 :
+			 Buffer[0] = 0x02;
+			 Buffer[7] = 0x26;	 //  (对应的ASICII码是0x28，上报值是0x26
+			 break;
+
+
+				
+			case 0x29 :
+			 Buffer[0] = 0x02;
+			 Buffer[7]= 0x27;	 //  )对应的ASICII码是0x29，上报值是0x27
+			 break;
+
+			case 0x5f :
+			 Buffer[0] = 0x02;
+			 Buffer[7] = 0x2d;	 //  _对应的ASICII码是0x5f，上报值是0x2d
+			 break;
+
+				
+			case 0x2b :
+			 Buffer[0] = 0x02;
+			 Buffer[7] = 0x2e;	 //  +对应的ASICII码是0x2b，上报值是0x2e
+			 break;
+
+			}
+
+ }
+	else if(language == SPAIN_LANGUAGE)
+	{
+	   switch(Keys){
+			case 48 :
+			Buffer[7] = KEY_0;	  //0  【字符0对应的ASIC码是 48】
+			break;
+			case 49 :
+			Buffer[7] = KEY_1;	  //1
+			break;
+			case 50 :
+			Buffer[7] = KEY_2;    //2		
+			break;
+			case 51 :
+			Buffer[7] = KEY_3;    //3
+			break;
+			case 52 :
+			Buffer[7] = KEY_4;    //4
+			break;
+			case 53 :
+			Buffer[7] = KEY_5;    //5
+				break;
+			case 54 :
+			Buffer[7] = KEY_6;    //6
+			break;
+			case 55 :
+			Buffer[7] = KEY_7;    //7
+			break;
+			case 56 :
+			Buffer[7] = KEY_8;    //8
+			break;
+			case 57 :
+			Buffer[7] = KEY_9;    //9
+			break;	
+			case 0x2c :
+			Buffer[7] = 0x36;    //,
+			break;
+			case 0x2e :
+			Buffer[7] = 0x37;    //.
+			break;
+			case 0x2F :
+			Buffer[0] =0x02;
+			Buffer[7] = 0x24;    //	/
+			break;
+			case 0x3b :
+			Buffer[0] =0x02;
+			Buffer[7] = 0x36;    //;    
+			break;
+			case 0x27 :
+			Buffer[7] = 0x34;    //'    
+			break;
+			case 0x5b :
+			Buffer[0] =0x05;	
+			Buffer[7]= 0x2f;    //[    
+				break;
+			case 0x5d  :
+			Buffer[0] =0x05;	
+			Buffer[7] = 0x30;    //]    
+			break;
+			case 0x5c :
+			Buffer[0] =0x05;	
+			Buffer[7] =0x35;    //\   
+			break;
+			case 0x60 :
+			Buffer[7] = 0x2f;    //`    
+			break;
+			case 0x2d :
+			Buffer[7] = 0x38;    //-     
+			break;
+			case 0x3d  :
+			Buffer[0] =0x02;
+			Buffer[7] = 0x27;    //=  
+			break;
+			case '\n'  :
+			Buffer[7] = 0x28; //回车键 
+			break;
+			case '\t'  :
+			Buffer[7] = 0x2b; //tab键
+			break;
+			case 32  :
+			Buffer[7] = 0x2c; //tab键
+			break;
+		 
+			
+			//带左shift键---
+			case 0x3c :
+			Buffer[7]= 0x64;   //  <
+			break; 
+			case 0x3e :
+			Buffer[0] =0x02; 
+			Buffer[7] = 0x64;    //  >
+			break; 
+			case 0x3f :
+			Buffer[0] = 0x02;
+			Buffer[7] = 0x2d;   //  ?
+			break;   
+			case 0x3a :
+			Buffer[0] = 0x02;
+				Buffer[7] = 0x37;   //  :
+			break;
+			case 0x22 :
+			Buffer[0] = 0x02;
+			Buffer[7] = 0x34;	 //  "
+			break;
+			case 0x7b :
+			Buffer[0] = 0x05;
+			Buffer[7] = 0x34;	 //  {
+			break;
+			case 0x7d :
+			Buffer[0] = 0x05;
+			Buffer[7] = 0x31;	 //  }
+			break;
+			case 0x7c :
+			Buffer[0] = 0x05;
+			Buffer[7] = 0x1e;	 //  |		 
+			break;
+			case 0x7e :
+			Buffer[0] = 0x05;
+			Buffer[7] = 0x21;	 //  ~
+			break;
+			case 0x21 :
+			 Buffer[0] = 0x02;
+			 Buffer[7] = 0x1e;	 //  !
+			 break;	
+
+			case 0x40 :
+			 Buffer[0] = 0x05;
+			 Buffer[7] = 0x1f;	 //  @
+			 break;
+
+				
+			case 0x23 :
+			 Buffer[0] = 0x05;
+			 Buffer[7] = 0x20;	 //  #
+			 break;
+
+			case 0x24 :
+			 Buffer[0] = 0x02;
+			 Buffer[7]= 0x21;	 //  $
+			 break;
+			
+			case 0x25 :
+			 Buffer[0] = 0x02;
+			 Buffer[7] = 0x22;	 //  %
+			 break;  
+
+			case 0x5e :
+			 Buffer[0] = 0x02;
+			 Buffer[7] = 0x2f;	 //  ^
+			 break;
+
+				
+			case 0x26 :
+			 Buffer[0] = 0x02;
+			 Buffer[7] = 0x23;	 //  &
+			 break;
+
+				
+			case 0x2a :
+			 Buffer[0] = 0x02;
+			 Buffer[7]= 0x30;	 //  *
+			 break;
+
+				
+			case 0x28 :
+			 Buffer[0] = 0x02;
+			 Buffer[7] = 0x25;	 //  (
+			 break;
+
+
+				
+			case 0x29 :
+			 Buffer[0] = 0x02;
+			 Buffer[7]= 0x26;	 //  )
+			 break;
+
+			case 0x5f :
+			 Buffer[0] = 0x02;
+			 Buffer[7] = 0x38;	 //  _
+			 break;
+
+				
+			case 0x2b :
+			 Buffer[7] = 0x30;	 //  +
+			 break;
+
+			}
+		
+	}
+
+}
+
+
+	//还有就是这个，不发送这个的话，键盘是无法停止输入的，所以最后要发这个来表示停止。。。
+   if (Keys==0)
+   {
+	 Buffer[7] =0;           	
+   }
+
+
+  /*copy mouse position info in ENDP1 Tx Packet Memory Area 【PMA Packet Memory Area 】*/
+  UserToPMABufferCopy(Buffer, GetEPTxAddr(ENDP1), 8);   //发8个字节
+  /* enable endpoint for transmission */
+  SetEPTxValid(ENDP1);
+
+}
+
+
 /*******************************************************************************
 * Function Name  : Get_SerialNum.
 * Description    : Create the serial number string descriptor.

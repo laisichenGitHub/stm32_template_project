@@ -2,6 +2,7 @@
 //#include "uuid.h"
 //#include "sys.h"
 #include "hw_config.h"
+#include "unicode.h"
 extern u8 EP1BUSY;			//键盘数据发送忙标志
 //设置USB 连接/断线
 //enable:0,断开
@@ -80,41 +81,96 @@ void usb_print(char *q)
 		}
 }
 
+void usb_print_by_chinese(char *q , unsigned char model)
+{
+		char *tok;
+		char m,lengh,i,legh;
+		char *p;
+		u8 OutString[10]={0};
+		u32 out_unicode;
+		
+	  delay_ms(20);
+		for( p= q ;(*p) != '\0' ; p++)
+		{
+			if(model==GBK_CODE)
+			{
+				if(*(u8*)p<0x81)
+				{
+					tok=strtok(p,"");
+					m= *tok;
+					
+					Joystick_Send_by_language(m,DISABLE,ENGLISH_LANGUAGE);
+					delay_us(1500);
 
 
-//void usb_print_yoko(char *q)
-//{
-//		char *tok;
-//		char m;
-//		char *p;
-//	  delay_ms(20);
-//		for( p= q ;(*p) != '\0' ; p++)
-//		{
-//				tok=strtok(p,"");
-//				m= *tok;
-//			
-//			  Joystick_Send(m);
-//				delay_us(800);
-//			  Joystick_Send(m);
-//				delay_us(800);
-//		  	Joystick_Send(m);
-//				delay_us(800);
-//			  Joystick_Send(m);
-//				delay_us(800);
-//			  Joystick_Send(m);
-//				delay_us(800);
-//				Joystick_Send(m);
-//				delay_us(800);
-//			  Joystick_Send(m);
-//				delay_us(800);
-//			
-//				Joystick_Send(0);
-//				delay_ms(1);
-//			  Joystick_Send(0);
-//				delay_ms(1);
-//		}
-//		Joystick_Send(0);  //发送停止
-//		delay_ms(1);
-//}
+					Joystick_Send_by_language(m,DISABLE,ENGLISH_LANGUAGE);
+					delay_us(1500);
+			 }	
+			 else
+			 {
+		 			GBK_STRING(p,OutString);
+				  lengh=strlen((char*)OutString);
+				  for(i=0;i<lengh;i++)
+					{
+						Joystick_Send_by_language(254,DISABLE,ENGLISH_LANGUAGE);
+						delay_us(1500);
+						if(OutString[i]==0x30)
+						   Joystick_Send_by_language(0x62,ENABLE,ENGLISH_LANGUAGE);
+						else
+						   Joystick_Send_by_language(OutString[i]+0x28,ENABLE,ENGLISH_LANGUAGE);
+						delay_us(1500);
+					}
+					Joystick_Send_by_language(254,DISABLE,ENGLISH_LANGUAGE);
+					delay_us(1500);
+					Joystick_Send_by_language(0,DISABLE,ENGLISH_LANGUAGE);
+					delay_us(1500);
+					memset(OutString,0,10);
+				  p++;
+			 }
+		  }
+			else if(model==UNICODE_CODE)
+			{
+				lengh=IsTextUTF8(p);
+				if(lengh==1)
+				{
+				  tok=strtok(p,"");
+					m= *tok;
+					
+					Joystick_Send_by_language(m,DISABLE,ENGLISH_LANGUAGE);
+					delay_us(1500);
+
+
+					Joystick_Send_by_language(0,DISABLE,ENGLISH_LANGUAGE);
+					delay_us(1500);
+				}
+				else
+				{
+					strncpy((char*)OutString,p,lengh);
+					enc_utf8_to_unicode_one(OutString,&out_unicode);
+					memset(OutString,0,10);
+					sprintf((char*)OutString,"%d",(int)out_unicode);
+					legh=strlen((char*)OutString);
+					 for(i=0;i<legh;i++)
+					{
+				    Joystick_Send_by_language(254,DISABLE,ENGLISH_LANGUAGE);
+						delay_us(1500);
+						if(OutString[i]==0x30)
+							Joystick_Send_by_language(0x62,ENABLE,ENGLISH_LANGUAGE);
+						else
+						   Joystick_Send_by_language(OutString[i]+0x28,ENABLE,ENGLISH_LANGUAGE);
+						delay_us(1500);
+					}
+					Joystick_Send_by_language(254,DISABLE,ENGLISH_LANGUAGE);
+					delay_us(1500);
+					Joystick_Send_by_language(0,DISABLE,ENGLISH_LANGUAGE);
+					delay_us(1500);
+					memset(OutString,0,10);
+				  p+=(lengh-1);
+					
+				}
+				
+			}
+		}
+}
 
 

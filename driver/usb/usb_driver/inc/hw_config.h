@@ -42,6 +42,7 @@ void Leave_LowPowerMode(void);
 void USB_Interrupts_Config(void);
 void USB_Cable_Config (FunctionalState NewState);
 void Joystick_Send(u8 Keys);
+void Joystick_Send_by_language(u8 Keys,u8 confirm,u8 language);
 //void Joystick_Send(uint8_t Keys);
 //uint8_t JoyState(void);
 void Get_SerialNum(void);
