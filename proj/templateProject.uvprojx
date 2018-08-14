@@ -390,9 +390,9 @@
           <GroupName>Devices</GroupName>
           <Files>
             <File>
-              <FileName>usb_use.c</FileName>
+              <FileName>usb_manager.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\driver\usb\usb_driver\src\usb_use.c</FilePath>
+              <FilePath>..\device\usb\usb_manager.c</FilePath>
             </File>
           </Files>
         </Group>
